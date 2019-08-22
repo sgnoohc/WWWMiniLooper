@@ -312,62 +312,62 @@ int main(int argc, char** argv)
 
         if (ana.search_mode == AnalysisConfig::kSRSSeeMjjIn)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSeeMjjIn.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSSeeMjjIn.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSSemMjjIn)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSemMjjIn.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSSemMjjIn.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSSmmMjjIn)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSmmMjjIn.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSSmmMjjIn.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSSeeMjjOut)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSeeMjjOut.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSSeeMjjOut.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSSemMjjOut)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSemMjjOut.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSSemMjjOut.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSSmmMjjOut)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSmmMjjOut.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSSmmMjjOut.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSS1Jee)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSS1Jee.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSS1Jee.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSS1Jem)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSS1Jem.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSS1Jem.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSRSS1Jmm)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSS1Jmm.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SRSS1Jmm.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSR0SFOS)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SR0SFOS.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SR0SFOS.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSR1SFOS)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SR1SFOS.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SR1SFOS.root";
         }
 
         if (ana.search_mode == AnalysisConfig::kSR2SFOS)
         {
-            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SR2SFOS.root";
+            signal_file_list_tstring = "www_optimization/v5.1.9_signal/signal_SR2SFOS.root";
         }
 
         // Open up the signal tchain
