@@ -40,9 +40,70 @@ public:
     // Custom Histograms object compatible with RooUtil::Cutflow framework
     RooUtil::Histograms histograms;
 
+    // Search mode
+    enum SearchMode 
+    {
+        kAll = -1,
+        kSRSSeeMjjIn = 0,
+        kSRSSemMjjIn,
+        kSRSSmmMjjIn,
+        kSRSSeeMjjOut,
+        kSRSSemMjjOut,
+        kSRSSmmMjjOut,
+        kSRSS1Jee,
+        kSRSS1Jem,
+        kSRSS1Jmm,
+        kSR0SFOS,
+        kSR1SFOS,
+        kSR2SFOS,
+    };
+
+    SearchMode search_mode;
+
+    // Index of the signal event to read the preferred cut values
+    int signal_index;
+
+    // The TTree to hold the signal tree
+    TChain* signal_tchain;
+
 };
 
 AnalysisConfig ana;
+
+class CutThresholds
+{
+public:
+    float mjj_window_width;
+    float met_pt;
+    float mtmax;
+    float dphi3lmet;
+    float lead_lep_pt;
+    int nj30;
+
+    void print_thresholds()
+    {
+        std::cout <<  " mjj_window_width: " << mjj_window_width <<  std::endl;
+        std::cout <<  " met_pt: " << met_pt <<  std::endl;
+        std::cout <<  " mtmax: " << mtmax <<  std::endl;
+        std::cout <<  " dphi3lmet: " << dphi3lmet <<  std::endl;
+        std::cout <<  " lead_lep_pt: " << lead_lep_pt <<  std::endl;
+        std::cout <<  " nj30: " << nj30 <<  std::endl;
+    }
+
+    void set_thresholds()
+    {
+        mjj_window_width = fabs(www.Mjj() - 80.);
+        met_pt           =      www.met_pt();
+        mtmax            =      www.MTmax();
+        dphi3lmet        =      www.DPhi3lMET();
+        lead_lep_pt      =      www.lep_pt()[0];
+        nj30             =      www.nj30();
+        print_thresholds();
+    }
+
+};
+
+CutThresholds cut_thresh;
 
 // ./process INPUTFILEPATH OUTPUTFILE [NEVENTS]
 int main(int argc, char** argv)
@@ -65,6 +126,8 @@ int main(int argc, char** argv)
         ("t,tree"        , "Name of the tree in the root file to open and loop over"                                             , cxxopts::value<std::string>())
         ("o,output"      , "Output file name"                                                                                    , cxxopts::value<std::string>())
         ("n,nevents"     , "N events to loop over"                                                                               , cxxopts::value<int>()->default_value("-1"))
+        ("m,mode"        , "Search mode"                                                                                         , cxxopts::value<int>()->default_value("-1"))
+        ("s,signal_index", "Signal index"                                                                                        , cxxopts::value<int>())
         ("j,nsplit_jobs" , "Enable splitting jobs by N blocks (--job_index must be set)"                                         , cxxopts::value<int>())
         ("I,job_index"   , "job_index of split jobs (--nsplit_jobs must be set. index starts from 0. i.e. 0, 1, 2, 3, etc...)"   , cxxopts::value<int>())
         ("d,debug"       , "Run debug job. i.e. overrides output option to 'debug.root' and 'recreate's the file.")
@@ -144,6 +207,10 @@ int main(int argc, char** argv)
     ana.n_events = result["nevents"].as<int>();
 
     //_______________________________________________________________________________
+    // --nevents
+    ana.search_mode = static_cast<AnalysisConfig::SearchMode>(result["mode"].as<int>());
+
+    //_______________________________________________________________________________
     // --nsplit_jobs
     if (result.count("nsplit_jobs"))
     {
@@ -159,6 +226,24 @@ int main(int argc, char** argv)
     else
     {
         ana.nsplit_jobs = -1;
+    }
+
+    //_______________________________________________________________________________
+    // --signal_index
+    if (result.count("signal_index"))
+    {
+        ana.signal_index = result["signal_index"].as<int>();
+        if (ana.signal_index < 0)
+        {
+            std::cout << options.help() << std::endl;
+            std::cout << "ERROR: option string --signal_index" << ana.signal_index << " has negative value!" << std::endl;
+            std::cout << "I am not sure what this means..." << std::endl;
+            exit(1);
+        }
+    }
+    else
+    {
+        ana.signal_index = -1;
     }
 
     //_______________________________________________________________________________
@@ -214,6 +299,94 @@ int main(int argc, char** argv)
     std::cout <<  " ana.nsplit_jobs: " << ana.nsplit_jobs <<  std::endl;
     std::cout <<  " ana.job_index: " << ana.job_index <<  std::endl;
     std::cout <<  "=========================================================" << std::endl;
+
+//=======================================================================
+//
+// Accessing the signal sample in order to get the desired cut thresholds
+//
+//=======================================================================
+
+    if (ana.signal_index >= 0)
+    {
+        TString signal_file_list_tstring = "";
+
+        if (ana.search_mode == AnalysisConfig::kSRSSeeMjjIn)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSeeMjjIn.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSSemMjjIn)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSemMjjIn.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSSmmMjjIn)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSmmMjjIn.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSSeeMjjOut)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSeeMjjOut.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSSemMjjOut)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSemMjjOut.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSSmmMjjOut)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSSmmMjjOut.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSS1Jee)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSS1Jee.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSS1Jem)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSS1Jem.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSRSS1Jmm)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SRSS1Jmm.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSR0SFOS)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SR0SFOS.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSR1SFOS)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SR1SFOS.root";
+        }
+
+        if (ana.search_mode == AnalysisConfig::kSR2SFOS)
+        {
+            signal_file_list_tstring = "/nfs-7/userdata/phchang/WWW_babies/v5.1.9_signal/signal_SR2SFOS.root";
+        }
+
+        // Open up the signal tchain
+        ana.signal_tchain = RooUtil::FileUtil::createTChain(ana.input_tree_name, signal_file_list_tstring);
+
+        // Check that the requested event number is OK
+        if (ana.signal_index >= ana.signal_tchain->GetEntries())
+        {
+            std::cout << "ERROR: --signal_index >= ana.signal_tchain.GetEntries() ! This does not make sense..." << std::endl;
+            exit(1);
+        }
+
+        ana.signal_tchain->GetEntry(0);
+        www.Init(ana.signal_tchain);
+        ana.signal_tchain->LoadTree(ana.signal_index);
+        www.GetEntry(ana.signal_index);
+        cut_thresh.set_thresholds();
+
+    }
 
 //********************************************************************************
 //
@@ -367,6 +540,7 @@ int main(int argc, char** argv)
     // And later in the loop when RooUtil::CutName::fill() function is called, the tree structure will be traversed through and the appropriate histograms will be filled with appropriate variables
     // After running the loop check for the histograms in the output root file
 
+
     // Set the cutflow object output file
     ana.cutflow.setTFile(ana.output_tfile);
 
@@ -390,12 +564,86 @@ int main(int argc, char** argv)
     ana.cutflow.addCut("SR1SFOS", [&]() { return www.SR1SFOS(); }, [&]() { return www.event_weight() * www.lepton_scale_factor() * www.btag_scale_factor() * www.trigger_scale_factor(); } );
     ana.cutflow.addCut("SR2SFOS", [&]() { return www.SR2SFOS(); }, [&]() { return www.event_weight() * www.lepton_scale_factor() * www.btag_scale_factor() * www.trigger_scale_factor(); } );
 
+    if (ana.search_mode == AnalysisConfig::kSRSSeeMjjIn or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSee");
+        ana.cutflow.addCutToLastActiveCut("SRSSeeNj2", [&]() { return www.nj30() >= 2; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SRSSeeNb0", [&]() { return www.nb() == 0; }, UNITY);
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSSemMjjIn or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSem");
+        ana.cutflow.addCutToLastActiveCut("SRSSemNj2", [&]() { return www.nj30() >= 2; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SRSSemNb0", [&]() { return www.nb() == 0; }, UNITY);
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSSmmMjjIn or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSmm");
+        ana.cutflow.addCutToLastActiveCut("SRSSmmNj2", [&]() { return www.nj30() >= 2; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SRSSmmNb0", [&]() { return www.nb() == 0; }, UNITY);
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSSeeMjjOut or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSee");
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSSemMjjOut or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSem");
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSSmmMjjOut or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSmm");
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSS1Jee or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSee");
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSS1Jem or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSem");
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSRSS1Jmm or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SRSSmm");
+    }
+
+    if (ana.search_mode == AnalysisConfig::kSR0SFOS or ana.search_mode == AnalysisConfig::kAll)
+    {
+        ana.cutflow.getCut("SR0SFOS");
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSNb0"       , [&]() { return www.nb() == 0; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSNj"        , [&]() { return www.nj30() <= cut_thresh.nj30; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSLepPt0"    , [&]() { return www.lep_pt()[0] >= cut_thresh.lead_lep_pt; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSMET"       , [&]() { return www.met_pt() >= cut_thresh.met_pt; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSDPhi3LMET" , [&]() { return www.DPhi3lMET() >= cut_thresh.dphi3lmet; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSMTmax"     , [&]() { return www.MTmax() >= cut_thresh.mtmax; }, UNITY);
+        ana.cutflow.addCutToLastActiveCut("SR0SFOSOptFull"   , UNITY, UNITY);
+    }
+
+    if (ana.search_mode == ana.kSR1SFOS or ana.search_mode == ana.kAll)
+    {
+        ana.cutflow.getCut("SR1SFOS");
+    }
+
+    if (ana.search_mode == ana.kSR2SFOS or ana.search_mode == ana.kAll)
+    {
+        ana.cutflow.getCut("SR2SFOS");
+    }
+
     // Print cut structure
     ana.cutflow.printCuts();
 
     // Histogram utility object that is used to define the histograms
     ana.histograms.addHistogram("nj", 7, 0, 7, [&]() { return www.nj(); } );
     ana.histograms.addHistogram("nj30", 7, 0, 7, [&]() { return www.nj30(); } );
+    ana.histograms.addHistogram("Mjj", 180, 0, 300, [&]() { return www.Mjj(); } );
 
     // Book cutflows
     ana.cutflow.bookCutflows();
