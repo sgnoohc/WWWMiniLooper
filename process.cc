@@ -296,6 +296,7 @@ int main(int argc, char** argv)
     std::cout <<  " ana.input_file_list_tstring: " << ana.input_file_list_tstring <<  std::endl;
     std::cout <<  " ana.output_tfile: " << ana.output_tfile->GetName() <<  std::endl;
     std::cout <<  " ana.n_events: " << ana.n_events <<  std::endl;
+    std::cout <<  " ana.signal_index: " << ana.signal_index <<  std::endl;
     std::cout <<  " ana.nsplit_jobs: " << ana.nsplit_jobs <<  std::endl;
     std::cout <<  " ana.job_index: " << ana.job_index <<  std::endl;
     std::cout <<  "=========================================================" << std::endl;

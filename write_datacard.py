@@ -1,7 +1,7 @@
 #!/bin/env python
 
-import datacard_writer as dw
-import pyrootutil as pr
+from rooutil import datacard_writer as dw
+from rooutil import pyrootutil as pr
 
 bkg_hists = pr.get_histograms([
     "hists/Run2/photon.root",
