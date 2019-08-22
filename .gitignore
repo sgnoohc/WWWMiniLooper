@@ -1,2 +1,8 @@
 hists
 plots
+package.tar.gz
+CMSSW_8_1_0/
+doAnalysis
+*.root
+*.o
+scan/
