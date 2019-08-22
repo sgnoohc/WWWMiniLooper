@@ -644,6 +644,7 @@ int main(int argc, char** argv)
     ana.histograms.addHistogram("nj", 7, 0, 7, [&]() { return www.nj(); } );
     ana.histograms.addHistogram("nj30", 7, 0, 7, [&]() { return www.nj30(); } );
     ana.histograms.addHistogram("Mjj", 180, 0, 300, [&]() { return www.Mjj(); } );
+    ana.histograms.addHistogram("Yield", 1, 0, 1, [&]() { return 0; } );
 
     // Book cutflows
     ana.cutflow.bookCutflows();
