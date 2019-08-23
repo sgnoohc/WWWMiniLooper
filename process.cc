@@ -646,6 +646,10 @@ int main(int argc, char** argv)
     ana.histograms.addHistogram("nj30", 7, 0, 7, [&]() { return www.nj30(); } );
     ana.histograms.addHistogram("Mjj", 180, 0, 300, [&]() { return www.Mjj(); } );
     ana.histograms.addHistogram("Yield", 1, 0, 1, [&]() { return 0; } );
+    ana.histograms.addHistogram("LepPt0", 180, 0, 180, [&]() { return www.lep_pt()[0]; } );
+    ana.histograms.addHistogram("MET", 180, 0, 180, [&]() { return www.met_pt(); } );
+    ana.histograms.addHistogram("DPhi3lMET", 180, 0, 3.1416, [&]() { return www.DPhi3lMET(); } );
+    ana.histograms.addHistogram("MTmax", 180, 0, 200, [&]() { return www.MTmax(); } );
 
     // Book cutflows
     ana.cutflow.bookCutflows();

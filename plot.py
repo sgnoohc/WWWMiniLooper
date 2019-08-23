@@ -13,12 +13,13 @@ p.dump_plot(
             ],
         sig_fnames=[
             ],
-        filter_pattern="__Mjj",
+        filter_pattern="__",
         usercolors = [920, 2007, 2005, 2003, 2001, 2011],
         dogrep=True,
         extraoptions={
             "signal_scale":1,
             "nbins":30,
             "bkg_sort_method":"unsorted",
+            "print_yield":True,
             }
         )
